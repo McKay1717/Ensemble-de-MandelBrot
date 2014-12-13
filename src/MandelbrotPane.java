@@ -1,6 +1,7 @@
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
@@ -10,7 +11,7 @@ import javax.swing.*;
 
 /**
  * Zone "image" de l'ensemble de MendelBrot
- * @author Nicolas I.
+ * @author Nicolas I., Marie B.
  *
  */
 public class MandelbrotPane extends JPanel implements MouseListener
@@ -23,6 +24,9 @@ public class MandelbrotPane extends JPanel implements MouseListener
 	private Mandelbrot mb = new Mandelbrot();
 	private int MAX = 20;
 	private Image image;
+	private ToolbarPane tpane;
+	private Point p1;
+	private Point p2;
 
 	/**
 	 * Initialize this pane
@@ -32,24 +36,83 @@ public class MandelbrotPane extends JPanel implements MouseListener
 		set = calculate();
 		this.addMouseListener(this);
 	}
+	/**
+	 * Permet la comunication entre les objet
+	 * @param t La boite à outil
+	 */
+	public void setTPane(ToolbarPane t)
+	{
+		tpane = t;
+		mb.setTPane(tpane);
+	}
+
 
 	/**
-	 * 
-	 * @return Quel mode de Math.exp est utilisé (true est exp approximative rapide, faux est lente exp exacte)
+	 * @return Le reel Minimal (X min)
 	 */
-	public boolean getExpMode()
+	public double GetMINRE()
 	{
-		return mb.getExpMode();
+		return mb.GetMINRE();
 	}
 
 	/**
-	 * 
-	 * @param b Si b est vrai, alors l'agorithme va utiliser une version rapide de Math.exp
+	 * @param s Le nouveau Reel Minimum
 	 */
-	public void useFastExp(boolean b)
+	public void SetMINRE( double s)
 	{
-		mb.useFastExp(b);
+		mb.SetMINRE(s);
 	}
+
+
+	/**
+	 * @return L'imaginaire Minimal (X min)
+	 */
+	public double GetMINIM()
+	{
+		return mb.GetMINIM();
+	}
+
+	/**
+	 * @param s Le nouveau imaginaire Minimum
+	 */
+	public void SetMINIM( double s)
+	{
+		mb.SetMINIM(s);
+	}
+
+	/**
+	 * @return Le reel Maximal (X MAX)
+	 */
+	public double GetMAXRE()
+	{
+		return mb.GetMAXRE();
+	}
+
+	/**
+	 * @param s Le nouveau Reel Maximum
+	 */
+	public void SetMAXRE( double s)
+	{
+		mb.SetMAXRE(s);
+	}
+
+
+	/**
+	 * @return L'imaginaire Maximal (X MAX)
+	 */
+	public double GetMAXIM()
+	{
+		return mb.GetMAXIM();
+	}
+
+	/**
+	 * @param s Le nouveau imaginaire Maximum
+	 */
+	public void SetMAXIM( double s)
+	{
+		mb.SetMAXIM(s);
+	}
+
 
 	/**
 	 * 
@@ -105,8 +168,11 @@ public class MandelbrotPane extends JPanel implements MouseListener
 	 */
 	public int getZoomFactor()
 	{
+
 		return mb.getZoomFactor();
 	}
+
+
 
 	/**
 	 * Crée l'image et la peint dans le volet
@@ -144,6 +210,7 @@ public class MandelbrotPane extends JPanel implements MouseListener
 	 */
 	public void render()
 	{
+
 		set = calculate();
 		this.repaint();
 	}

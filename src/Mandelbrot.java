@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 /**
  * Calcule De l'Ensemble de Mendelbrot
- * @author Nicolas I.
+ * @author Nicolas I., Marie B.
  *
  */
 public class Mandelbrot
@@ -21,37 +21,28 @@ public class Mandelbrot
 	protected double RE_FACTOR = (MAXRE-MINRE)/(ImageWidth-1);
 	protected double IM_FACTOR = (MAXIM-MINIM)/(ImageHeight - 1);
 	private int zoom;
-	private int colorModifier;
-	private boolean useFastExp = true;
-	private double PasX, PasY, zx, zy, cX, cY, tmp;
+	private double PasX;
+	private double PasY;
+	private double zx;
+	private double zy;
+	private double cX ;
+	private double cY; 
+	private double tmp;
 	private int iter;
+
+	private ToolbarPane tpane;
+
+
 
 	/**
 	 *Les valeurs par défaut
 	 */
 	public Mandelbrot()
 	{
-		colorModifier = 10;
 		zoom = 2;
 	}
 
-	/**
-	 * Defini si un utilise des aproximation
-	 * @param b
-	 */
-	public void useFastExp(boolean b)
-	{
-		useFastExp = b;
-	}
 
-	/**
-	 * 
-	 * @return true Si on un aproximise
-	 */
-	public boolean getExpMode()
-	{
-		return useFastExp;
-	}
 
 	/**
 	 * Réinitialiser les valeurs par défaut
@@ -94,25 +85,81 @@ public class Mandelbrot
 		return zoom;
 	}
 
-
+	
 	/**
-	 * Définit le modificateur de couleur. Non Utilisé pour l'instant previson d'un usage futur
-	 *@param S s 10% aura un effet (en fait 0-9)
-	 * /
-	public void setColorModifier(int s)
-	{
-		colorModifier = s;
-	}
-
-	/**
-	 * 
-	 * @return Le modificateur de couleurs
+	 * @return Le reel Minimal (X min)
 	 */
-	public int getColorModifier()
+	public double GetMINRE()
 	{
-		return colorModifier;
+		return MINRE;
 	}
 
+	/**
+	 * @param s Le nouveau Reel Minimum
+	 */
+	public void SetMINRE( double s)
+	{
+		MINRE = s;
+	}
+	
+
+	/**
+	 * @return L'imaginaire Minimal (X min)
+	 */
+	public double GetMINIM()
+	{
+		return MINIM;
+	}
+
+	/**
+	 * @param s Le nouveau imaginaire Minimum
+	 */
+	public void SetMINIM( double s)
+	{
+		MINIM = s;
+	}
+
+	/**
+	 * @return Le reel Maximal (X MAX)
+	 */
+	public double GetMAXRE()
+	{
+		return MAXRE;
+	}
+
+	/**
+	 * @param s Le nouveau Reel Maximum
+	 */
+	public void SetMAXRE( double s)
+	{
+		MAXRE = s;
+	}
+	
+
+	/**
+	 * @return L'imaginaire Maximal (X MAX)
+	 */
+	public double GetMAXIM()
+	{
+		return MAXIM;
+	}
+
+	/**
+	 * @param s Le nouveau imaginaire Maximum
+	 */
+	public void SetMAXIM( double s)
+	{
+		MAXIM = s;
+	}
+
+	/**
+	 * Permet la comunication entre les objet
+	 * @param t La boite à outil
+	 */
+	public void setTPane(ToolbarPane t)
+	{
+		tpane = t;
+	}
 	/**
 	 * Gestion du Zoom
 	 *@param ClickPoint L'emplacement qui a été cliqué
@@ -120,13 +167,13 @@ public class Mandelbrot
 	 */
 	public void changeView(Point clickPoint, boolean zoomIn)
 	{
-		double c_im = MAXIM - clickPoint.getY() * IM_FACTOR;
-		double c_re = MINRE + clickPoint.getX() * RE_FACTOR;	
+		double c_im = MAXIM - (clickPoint.y) * IM_FACTOR;
+		double c_re = MINRE + clickPoint.x * RE_FACTOR;	
 		double rediff, imdiff;
 		if(zoomIn)
 		{
 			rediff = (MAXRE - MINRE)/zoom;
-			imdiff = (MAXIM - MINIM)/zoom;
+			imdiff = (MAXIM - MINIM)/zoom ;
 		}
 		else
 		{
@@ -137,7 +184,10 @@ public class Mandelbrot
 		MAXRE = c_re + (rediff / 2);
 		MINIM = c_im - imdiff/2;
 		refactor();
+
 	}
+
+
 
 	/**
 	 * Définit les facteurs et les valeurs de MAXIM
@@ -147,6 +197,7 @@ public class Mandelbrot
 		RE_FACTOR = (MAXRE-MINRE)/(ImageWidth-1);
 		MAXIM = MINIM+(MAXRE-MINRE)*ImageHeight/ImageWidth;
 		IM_FACTOR = (MAXIM-MINIM)/(ImageHeight - 1);
+		tpane.update();
 	}
 
 	/**
@@ -207,19 +258,5 @@ public class Mandelbrot
 			}
 		}
 		return ret;
-	}
-
-	/**
-	 * Utiliation d'aproximation ou non pour la valeur donné
-	 * @param val
-	 * @return 
-	 */
-	private double exp(double val) {
-		if(useFastExp)
-		{
-			final long tmp = (long) (1512775 * val + 1072632447);
-			return Double.longBitsToDouble(tmp << 32);
-		}
-		return Math.exp(val);
 	}
 }

@@ -7,7 +7,7 @@ import observer.Observable;
  
 /**
  * Crée la fenêtre principale et l'exécute
- * @author Nicolas I.
+ * @author Nicolas I., Marie B.
  *
  */
 public class Runner extends JFrame implements Observable
@@ -37,8 +37,10 @@ public class Runner extends JFrame implements Observable
 		mPane.setSize(ImageWidth, ImageHeight);
 		mPane.setLocation(0, 0);
 		
+		
 		tPane = new ToolbarPane(ImageWidth, 220, mPane, this, true);
 		tPane.setLocation(0, mPane.getHeight()+5);
+		mPane.setTPane(tPane);
 		
 		tbd=  new ToolboxDialog(this, false);
 		tbd.setSize(tPane.getWidth(), tPane.getHeight());

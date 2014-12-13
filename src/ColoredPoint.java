@@ -4,7 +4,7 @@ import java.awt.Point;
 /**
  * Point colorer RGB
  * 
- * @author Nicolas I.
+ * @author Nicolas I., Marie B.
  *
  */
 public class ColoredPoint extends Point

@@ -3,6 +3,8 @@ import java.awt.event.ActionListener;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 
 import javax.imageio.ImageIO;
@@ -22,7 +24,7 @@ import observer.Observable;
  * Re-rendu de l'image
  * Sélection entre une mise en œuvre approximatives et exacte de Math.exp ()
  *
- *@author Nicolas I.
+ *@author Nicolas I., Marie B.
  *
  */
 public class ToolbarPane extends JPanel implements ActionListener
@@ -32,23 +34,30 @@ public class ToolbarPane extends JPanel implements ActionListener
 	 */
 	private static final long serialVersionUID = -1413862779872127736L;
 	private JButton render, save, resize, reset, popout;
-	private JLabel maxLabel, colorLabel, zoomLabel, dimensionLabel, expLabel;
-	private JFormattedTextField maxField, zoomField, wField, hField;
+	private JLabel maxLabel, colorLabel, zoomLabel, dimensionLabel, reel1Label, img1Label;
+	private JFormattedTextField maxField, zoomField, wField, hField, reel1Field, img1Field;
 	private MandelbrotPane mPane;
 	private JFrame parent;
 	private Observable obs;
 	private boolean docked;
-	private JCheckBox expCheckBox;
+	private JLabel reel2Label;
+	private JFormattedTextField reel2Field;
+	private JLabel img2Label;
+	private JFormattedTextField img2Field;
+	private DecimalFormatSymbols dfs;
+	private DecimalFormat dFormat;
+
+
 
 	/**
-	* Initialise tout et ajoute à la Pane (Taille Indefini pour le momant)
-	* Utilise le positionnement absolu
-	*@param W La largeur de ce volet
-	*@param H La hauteur de ce volet
-	*@param Mpane Le MandelbrotPane qui sera mis à jour
-	*@param Parent Le parent 
-	*@param docked Attaché ou non,
-	*/
+	 * Initialise tout et ajoute à la Pane (Taille Indefini pour le momant)
+	 * Utilise le positionnement absolu
+	 *@param W La largeur de ce volet
+	 *@param H La hauteur de ce volet
+	 *@param Mpane Le MandelbrotPane qui sera mis à jour
+	 *@param Parent Le parent 
+	 *@param docked Attaché ou non,
+	 */
 	public ToolbarPane(int w, int h, MandelbrotPane mPane, JFrame parent, boolean docked)
 	{
 		this.docked = docked;
@@ -75,6 +84,7 @@ public class ToolbarPane extends JPanel implements ActionListener
 		colorLabel = new JLabel("Modificateur de couleur:");
 
 		NumberFormat format = NumberFormat.getNumberInstance();
+
 		format.setGroupingUsed(false);
 		maxField = new JFormattedTextField(format);
 		maxField.setValue(mPane.getMaxIterations());
@@ -84,9 +94,6 @@ public class ToolbarPane extends JPanel implements ActionListener
 
 		zoomField = new JFormattedTextField(format);
 		zoomField.setValue(mPane.getZoomFactor());
-
-		expLabel = new JLabel("Fast Exp:");
-		expCheckBox = new JCheckBox();
 
 		dimensionLabel = new JLabel("Largeur - Hauteur");
 
@@ -98,6 +105,32 @@ public class ToolbarPane extends JPanel implements ActionListener
 
 		resize = new JButton("Redimensioner");
 		resize.addActionListener(this);
+
+
+		dfs = new DecimalFormatSymbols();
+		dfs.setDecimalSeparator('.'); //separator for the decimals
+		dfs.setGroupingSeparator(','); //separator for the thousands
+		dFormat = new DecimalFormat ("#0.##", dfs);
+		
+		reel1Label = new JLabel("Réel 1:");
+
+		reel1Field = new JFormattedTextField(dfs);
+		reel1Field.setValue(mPane.GetMINRE());
+
+		img1Label = new JLabel("Imaginaire 1:");
+
+		img1Field = new JFormattedTextField(dfs);
+		img1Field.setValue(mPane.GetMINIM());
+
+		reel2Label = new JLabel("Réel 2:");
+
+		reel2Field = new JFormattedTextField(dfs);
+		reel2Field.setValue(mPane.GetMAXRE());
+
+		img2Label = new JLabel("Imaginaire 2:");
+
+		img2Field = new JFormattedTextField(dfs);
+		img2Field.setValue(mPane.GetMAXIM());
 
 		initialize();
 
@@ -114,8 +147,15 @@ public class ToolbarPane extends JPanel implements ActionListener
 		this.add(hField);
 		this.add(resize);
 		this.add(reset);
-		//this.add(expLabel);
-		//this.add(expCheckBox);
+		this.add(reel1Field);
+		this.add(reel1Label);
+		this.add(img1Field);
+		this.add(img1Label);
+		this.add(reel2Field);
+		this.add(reel2Label);
+		this.add(img2Field);
+		this.add(img2Label);
+
 	}
 
 	/**
@@ -145,7 +185,11 @@ public class ToolbarPane extends JPanel implements ActionListener
 		{
 			mPane.setMaxIterations(Math.abs(Integer.parseInt(maxField.getText())));
 			mPane.setZoomFactor(Math.abs(Integer.parseInt(zoomField.getText())));
-			mPane.useFastExp(expCheckBox.isSelected());
+			mPane.SetMINRE(Double.parseDouble(reel1Field.getText()));
+			mPane.SetMINIM(Double.parseDouble(img1Field.getText()));
+			mPane.SetMAXRE(Double.parseDouble(reel2Field.getText()));
+			mPane.SetMAXIM(Double.parseDouble(img2Field.getText()));
+
 			mPane.render();
 		}
 		//Sauvegardez l'image
@@ -165,7 +209,7 @@ public class ToolbarPane extends JPanel implements ActionListener
 				e.printStackTrace();
 			}
 		}
-		
+
 		else if(event.getSource() == resize)
 		{
 			mPane.changeSize(Math.abs(Integer.parseInt(wField.getText())), Math.abs(Integer.parseInt(hField.getText())));	
@@ -185,6 +229,10 @@ public class ToolbarPane extends JPanel implements ActionListener
 		else if(event.getSource() == reset)
 		{
 			mPane.reset();
+			reel1Field.setValue(mPane.GetMINRE());
+			img1Field.setValue(mPane.GetMINIM());
+			reel2Field.setValue(mPane.GetMAXRE());
+			img2Field.setValue(mPane.GetMAXIM());
 		}
 		// détacher ce volet
 		else if(event.getSource() == popout)
@@ -198,7 +246,7 @@ public class ToolbarPane extends JPanel implements ActionListener
 	private void initialize()
 	{			
 		popout.setSize(60, 25);
-		popout.setLocation(getWidth() - popout.getWidth() - 3, 5);
+		popout.setLocation(getWidth() - popout.getWidth() - 3, 75);
 
 		maxLabel.setSize(125, 25);
 		maxLabel.setLocation(0, 5);
@@ -217,12 +265,6 @@ public class ToolbarPane extends JPanel implements ActionListener
 		zoomField.setSize(125, 25);
 		zoomField.setLocation(zoomLabel.getX()+zoomLabel.getWidth(), zoomLabel.getY());
 
-		expLabel.setSize(75, 25);
-		expLabel.setLocation(zoomField.getX() + zoomField.getWidth(), zoomField.getY());
-
-		expCheckBox.setSize(25, 25);
-		expCheckBox.setLocation(expLabel.getX() + expLabel.getWidth(), expLabel.getY());
-		expCheckBox.setSelected(mPane.getExpMode());
 
 		dimensionLabel.setSize(125, 25);
 		dimensionLabel.setLocation(0, zoomLabel.getY() + 35);
@@ -244,6 +286,43 @@ public class ToolbarPane extends JPanel implements ActionListener
 
 		reset.setSize(125, 25);
 		reset.setLocation(save.getX()+reset.getWidth(), save.getY());
+
+		reel1Label.setSize(70, 25);
+		reel1Label.setLocation(maxLabel.getWidth() + maxField.getWidth() +35 , maxLabel.getY());
+
+		reel1Field.setSize(70, 25);
+		reel1Field.setLocation(reel1Label.getX() +45 , reel1Label.getY());
+
+		img1Label.setSize(75, 25);
+		img1Label.setLocation(zoomLabel.getWidth() + zoomField.getWidth() +35 , zoomLabel.getY());
+
+		img1Field.setSize(60, 25);
+		img1Field.setLocation(img1Label.getX()+ img1Label.getWidth()  , img1Label.getY());
+
+		reel2Label.setSize(70, 25);
+		reel2Label.setLocation(reel1Label.getWidth() + reel1Field.getWidth() + zoomLabel.getWidth() + zoomField.getWidth() +45, maxLabel.getY());
+
+		reel2Field.setSize(60, 25);
+		reel2Field.setLocation(reel2Label.getX() +45 , reel2Label.getY());
+
+		img2Label.setSize(75, 25);
+		img2Label.setLocation(img1Label.getWidth() + img1Field.getWidth() + zoomLabel.getWidth() + zoomField.getWidth() +45 , zoomLabel.getY());
+
+		img2Field.setSize(60, 25);
+		img2Field.setLocation(img2Label.getX()+ img2Label.getWidth() /*-55*/ , img2Label.getY());
+
+
+	}
+	
+	/**
+	 * Met à jour les valeur des champ imaginaire et reel
+	 */
+	protected void update()
+	{
+		reel1Field.setValue(mPane.GetMINRE());
+		img1Field.setValue(mPane.GetMINIM());
+		reel2Field.setValue(mPane.GetMAXRE());
+		img2Field.setValue(mPane.GetMAXIM());
 	}
 
 }
