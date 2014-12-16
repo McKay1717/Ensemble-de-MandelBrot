@@ -1,4 +1,4 @@
-Ensemble-de-MendelBrot
+Ensemble-de-MandelBrot
 ======================
 Permet de visualiser l'ensemble de MandelBrot .
 Clic gauche pour zoomer 
